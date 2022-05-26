@@ -1,4 +1,5 @@
-# project-one
+# Permissioned Blockchain for establishing Trusted Ratings
+
 ## (1) Clone the repository
 git clone https://github.com/vishalmahajan0705/project-one.git
 
