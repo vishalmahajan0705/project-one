@@ -7,8 +7,6 @@ import com.project.blockchain.Transaction;
 import com.project.consensus.Ballot;
 import com.project.consensus.CoordinationService;
 import com.project.network.AbstractMulticastNode;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,14 +20,12 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 
-
 @Component
 public class RatingAgent extends AbstractMulticastNode implements DisposableBean{
 
 
 
     private String ratingAgentId;
-    Logger logger = LogManager.getLogger(getClass());
 
     private Blockchain localBlockchain;
 

@@ -21,6 +21,7 @@ public class Blockchain {
 
     public Blockchain(String path) {
         this.path = path;
+        System.out.println(path);
         bChain.add(new Block("0",0));
     }
 
@@ -73,7 +74,7 @@ public class Blockchain {
         try (InputStream in = Files.newInputStream(FileSystems.getDefault().getPath(path));
              BufferedReader reader =
                      new BufferedReader(new InputStreamReader(in))) {
-            String line = null;
+            String line;
             while ((line = reader.readLine()) != null) {
                 blocks.add(Block.fromJSON(line));
             }
