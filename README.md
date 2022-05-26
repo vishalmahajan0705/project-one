@@ -15,7 +15,7 @@ This will start zookeeper at 127.0.0.1:2181
 
 ## (4) Start Internal Event Source(s)
 cd project-one <br>
-following command will start Internal Source with ID 1
+mvn spring-boot:run -Dspring-boot.run.arguments=IS,2 
 
 ## (5) Start External  Event Source(s)
 mvn spring-boot:run -Dspring-boot.run.arguments=ES,2 
