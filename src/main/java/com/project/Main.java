@@ -14,10 +14,7 @@ import org.springframework.context.annotation.Bean;
 public class Main {
     static String nodeType = null, nodeId =null;
     public static void main(String[] args) {
-        String[] arg = args[0].split(",");
-        nodeType = arg[0];
-        nodeId = arg[1];
-
+        parseArgs(args);
 
         SpringApplication app = new SpringApplication(Main.class);
 
@@ -26,12 +23,12 @@ public class Main {
         app.run(args);
     }
 
+
+
     @Bean
     public CommandLineRunner commandLineRunner(ApplicationContext ctx) {
         return args -> {
             try {
-
-
 
                 if(nodeType.equals("IS")) {
                    new InternalEventSource(nodeId).sendEvent();
@@ -42,11 +39,23 @@ public class Main {
 
                 }
 
-                System.out.println("Started:: "+nodeType+" " +nodeId);
+                System.out.println("Started:: "+nodeType+" NodeID ::" +nodeId);
 
             } catch(Exception e){
                 e.printStackTrace();
             }
         };
+    }
+
+    private static void parseArgs(String[] args) {
+        if(args[0].contains(",")){
+            String[] arg = args[0].split(",");
+            System.out.println(arg.length);
+            nodeType = arg[0];
+            nodeId = arg[1];
+        }else{
+            nodeType = args[0];
+            nodeId = "ZKAssigned";
+        }
     }
 }
