@@ -186,6 +186,7 @@ public class RatingAgent extends AbstractMulticastNode implements DisposableBean
         for (Transaction blockTransaction : blockTransactions) {
             poolTransactions.remove(blockTransaction);
         }
+        block.setStage(Constants.COMMITTED);
         this.getLocalBlockchain().commitBlock(block);
         if(block.getRatingAgentId().equals(this.getRatingAgentId())){
             Blockchain.log(block);
