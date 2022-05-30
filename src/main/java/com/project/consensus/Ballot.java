@@ -17,8 +17,13 @@ public class Ballot {
         voteCount++;
     }
 
+
+    /* if votes exceed 2/3 times the total nodes, consensus is achieved.
+       vote count maintained at a epoc level and is incremented each time a node receives vote on a block in given epoch
+     */
+
     public boolean hasConsensus(){
-        return voteCount>=Math.ceil((2/3)*totalNodes);
+        return voteCount>=Math.ceil((double) (2/3)*totalNodes);
     }
 
     @Override
