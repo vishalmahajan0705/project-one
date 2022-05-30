@@ -1,5 +1,7 @@
 package com.project.blockchain;
 
+import com.project.Constants;
+
 import java.io.*;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
@@ -42,7 +44,7 @@ public class Blockchain {
         return pendingTransactions;
     }
 
-    public synchronized void commitBlock(Block block) {
+    public void commitBlock(Block block) {
         BufferedWriter bw = null;
         try {
 
@@ -68,6 +70,30 @@ public class Blockchain {
 
     }
 
+    public static void log(Block block) {
+        BufferedWriter bw = null;
+        try {
+
+            FileWriter fw = new FileWriter(Constants.BLOCKCHAIN_PATH_PREFIX+"master"+Constants.BLOCKCHAIN_PATH_SUFFIX, true);
+            bw = new BufferedWriter(fw);
+            bw.write(block.toJSON());
+
+            bw.newLine();
+            bw.flush();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                assert bw != null;
+                bw.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+    }
+
     public  List<Block> readBlocks(String firmId,long startTime,long endTime){
         List<Block> blocks = new ArrayList<>();
 
@@ -79,7 +105,7 @@ public class Blockchain {
                 blocks.add(Block.fromJSON(line));
             }
         } catch (IOException e) {
-            System.err.println(e);
+            System.err.println(e.getMessage());
         }
 
         System.out.println(blocks.size());

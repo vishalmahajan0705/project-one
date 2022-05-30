@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.project.utils.Utils;
 import org.json.JSONException;
 
+import java.util.Date;
 import java.util.Objects;
 
 public class Transaction implements java.io.Serializable{
@@ -15,8 +16,11 @@ public class Transaction implements java.io.Serializable{
     private String sentBy;
     private String marketEventSourceId;
     private String marketEvent;
+    private long timestamp;
+
 
     public Transaction() {
+        this.timestamp= new Date().getTime();
     }
 
     public String getFirmId() {
@@ -67,6 +71,14 @@ public class Transaction implements java.io.Serializable{
         this.marketEvent = marketEvent;
     }
 
+    public long getTimestamp() {
+        return timestamp;
+    }
+
+    public void setTimestamp(long timestamp) {
+        this.timestamp = timestamp;
+    }
+
     public String toJSON() throws JSONException {
 
         try {
@@ -95,8 +107,11 @@ public class Transaction implements java.io.Serializable{
         if (this == o) return true;
         if (!(o instanceof Transaction)) return false;
         Transaction that = (Transaction) o;
-        return firmId.equals(that.firmId) && eventId.equals(that.eventId) && firmEvent.equals(that.firmEvent) && sentBy.equals(that.sentBy) && Objects.equals(marketEventSourceId, that.marketEventSourceId) && Objects.equals(marketEvent, that.marketEvent);
+        return timestamp == that.timestamp && Objects.equals(firmId, that.firmId) && Objects.equals(eventId, that.eventId) && Objects.equals(firmEvent, that.firmEvent) && Objects.equals(sentBy, that.sentBy) && Objects.equals(marketEventSourceId, that.marketEventSourceId) && Objects.equals(marketEvent, that.marketEvent);
     }
 
-
+    @Override
+    public int hashCode() {
+        return Objects.hash(firmId, eventId, firmEvent, sentBy, marketEventSourceId, marketEvent, timestamp);
+    }
 }

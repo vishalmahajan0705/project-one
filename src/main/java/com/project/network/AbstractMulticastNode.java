@@ -22,7 +22,7 @@ public abstract class AbstractMulticastNode {
                 group, PORT);
         socket.send(packet);
         socket.close();
-        System.out.println(message);
+   //     System.out.println(message);
 
     }
 
@@ -33,8 +33,7 @@ public abstract class AbstractMulticastNode {
         receive(HOST,PORT);
     }
 
-    private void receive(String ip, int port) throws
-            IOException {
+    private void receive(String ip, int port) {
 
         Thread t = new Thread(() -> {
             try {

@@ -10,6 +10,7 @@ import com.project.network.AbstractMulticastNode;
 
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
@@ -19,13 +20,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-
+@Profile("Normal")
 @Component
 public class RatingAgent extends AbstractMulticastNode implements DisposableBean{
 
 
 
     private String ratingAgentId;
+    private final Object mutex = new Object();
 
     private Blockchain localBlockchain;
 
@@ -52,7 +54,7 @@ public class RatingAgent extends AbstractMulticastNode implements DisposableBean
     private final Map<Integer, Ballot> ballotsByEpoch = new ConcurrentHashMap<>();
 
 
-    public void  processMessage(String message) {
+    public synchronized void  processMessage(String message) {
         if(!message.contains(Constants.BLOCK_ATTRIBUTE)){
             Transaction transaction = Transaction.fromJSON(message);
             localBlockchain.addTransaction(transaction);
@@ -68,6 +70,11 @@ public class RatingAgent extends AbstractMulticastNode implements DisposableBean
                     ballotsByEpoch.put(block.getEpoch(), new Ballot(block.getHash(), zks.totalNodes(Constants.RATING_AGENT_DIR),block.getEpoch() ));
                 }
                 ballotsByEpoch.get(block.getEpoch()).addVote();
+                if(ballotsByEpoch.get(block.getEpoch()).hasConsensus()){
+                    synchronized (mutex) {
+                        mutex.notifyAll();
+                    }
+                }
             }
             else{
                 prepare(block);
@@ -82,15 +89,28 @@ public class RatingAgent extends AbstractMulticastNode implements DisposableBean
     Corresponding transactions can be picked up in subsequent epochs for inclusion in future blocks.
     */
 
-    public boolean propose(Block block){
+    public  boolean propose(Block block){
+
 
         System.out.println("Proposing ... "+block.getEpoch()+" " +block.getHash() + " ");
 
+
         try {
             this.send(block.toJSON());
-            Thread.sleep(1000);
+
+            try {
+                synchronized (mutex){
+                    mutex.wait(3000);
+                }
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
             return ballotsByEpoch.get(block.getEpoch()).hasConsensus();
+
+
         } catch (Exception e) {
+            System.out.println("Exception "+e.getMessage());
             e.printStackTrace();
         }
         return false;
@@ -104,15 +124,14 @@ public class RatingAgent extends AbstractMulticastNode implements DisposableBean
     If all conditions meet, the rating agent not will cast a vote of acceptance.
     */
     public void vote(Block block) {
-        System.out.println("Entered voting...");
 
-        if(getLocalBlockchain().getLastBlock().getEpoch()>=block.getEpoch()){
-            System.out.println("Can't add lower epoc " + getLocalBlockchain().getLastBlock().getEpoch() +" "+block.getEpoch());
+
+        if (getLocalBlockchain().getLastBlock().getEpoch() >= block.getEpoch()) {
+            System.out.println("Can't add lower epoc " + getLocalBlockchain().getLastBlock().getEpoch() + " " + block.getEpoch());
             return;
         }
 
-        System.out.println(block);
-        if(!getLocalBlockchain().getLastBlock().getHash().equals(block.getPreviousHash())){
+        if (!getLocalBlockchain().getLastBlock().getHash().equals(block.getPreviousHash())) {
             System.out.println("PreviousHash on current block must match the hash of last block.");
             return;
         }
@@ -120,14 +139,15 @@ public class RatingAgent extends AbstractMulticastNode implements DisposableBean
         List<Transaction> blockTransactions = block.getTransactions();
         List<Transaction> poolTransactions = localBlockchain.getPendingTransactions().get(block.getEventId());
 
-        if(poolTransactions!=null) {
+        if (poolTransactions != null) {
             for (Transaction blockTransaction : blockTransactions) {
                 if (!poolTransactions.contains(blockTransaction)) {
-                    System.out.println("All transactions did not match");
+                    System.out.println("All transactions did not match , Invalid Block:: " + block.getEpoch() +" "+block.getTransactions());
                     return;
                 }
             }
         }
+
 
         try {
 
@@ -142,6 +162,7 @@ public class RatingAgent extends AbstractMulticastNode implements DisposableBean
 
 
 
+
     /*
     To eliminate the effect of a byzantine leader who issued a prepare for block,
     Individual nodes retest for 2n/3 votes before issuing a final commit call.
@@ -151,7 +172,6 @@ public class RatingAgent extends AbstractMulticastNode implements DisposableBean
 
         if(ballotsByEpoch.get(block.getEpoch()).hasConsensus()){
             commit(block);
-            System.out.println("confirmed..");
         }
 
     }
@@ -167,7 +187,12 @@ public class RatingAgent extends AbstractMulticastNode implements DisposableBean
             poolTransactions.remove(blockTransaction);
         }
         this.getLocalBlockchain().commitBlock(block);
-        System.out.println("Committed..... " + block.getEventId());
+        if(block.getRatingAgentId().equals(this.getRatingAgentId())){
+            Blockchain.log(block);
+        }
+
+        System.out.println("Committed..");
+
 
     }
 
@@ -190,6 +215,8 @@ public class RatingAgent extends AbstractMulticastNode implements DisposableBean
     public void setRatingAgentId(String ratingAgentId) {
         this.ratingAgentId = ratingAgentId;
     }
+
+
 
 
 

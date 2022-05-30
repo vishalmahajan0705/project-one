@@ -23,8 +23,10 @@ public class Ballot {
      */
 
     public boolean hasConsensus(){
-        return voteCount>=Math.ceil((double) (2/3)*totalNodes);
+        return voteCount>=Math.ceil(totalNodes*(2/3f));
     }
+
+
 
     @Override
     public String toString() {
@@ -32,7 +34,7 @@ public class Ballot {
                 "blockhash='" + blockhash + '\'' +
                 ", voteCount=" + voteCount +
                 ", totalNodes=" + totalNodes +
-                ", epoch=" + epoch +
+                ", epoch=" + epoch  +
                 '}';
     }
 }

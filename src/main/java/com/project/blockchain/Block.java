@@ -63,6 +63,7 @@ public class Block {
 
     }
 
+
     private String merkleTree(List<String> txnHashes){
         if(txnHashes.size()==1) return txnHashes.get(0);
         if(txnHashes.size()%2!=0) txnHashes.add(txnHashes.get(txnHashes.size()-1));

@@ -59,7 +59,7 @@ public class CoordinationService {
 
     public String create(String path, byte[] data) throws KeeperException, InterruptedException
     {
-        return zConn.create(path,data,ZooDefs.Ids.OPEN_ACL_UNSAFE,CreateMode.PERSISTENT_SEQUENTIAL);
+        return zConn.create(path,data,ZooDefs.Ids.OPEN_ACL_UNSAFE,CreateMode.EPHEMERAL_SEQUENTIAL);
 
     }
 
@@ -125,9 +125,12 @@ public class CoordinationService {
                                 if(majorityVote) {
                                     newBlock.setStage(Constants.PREPARE);
                                     r.send(newBlock.toJSON());
+                                    System.out.println("proposed block in epoch " + b.getEpoch() );
+                                }else{
+                                    System.out.println("Not proposing block");
                                 }
 
-                                System.out.println("proposed block " + b.getEpoch() );
+
                             }
 
                             Thread.sleep(TimeUnit.SECONDS.toMillis(epocInterval));
@@ -135,12 +138,11 @@ public class CoordinationService {
                         }
                         catch ( Exception e )
                         {
-                            System.err.println(" was interrupted." );
+                            System.out.println(" was interrupted." );
                             e.printStackTrace();
                         }
                         finally
                         {
-                            System.out.println(" Done leading." );
                             leaderSelector.autoRequeue();
                         }
                     }

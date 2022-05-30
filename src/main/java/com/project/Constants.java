@@ -21,6 +21,6 @@ public class Constants {
     public static final String PREPARE = "prepare";
 
     public static final String BLOCKCHAIN_PATH_PREFIX = "src/main/resources/local/rating-agent-";
-    public static final String BLOCKCHAIN_PATH_SUFFIX = "blockchain.json";
+    public static final String BLOCKCHAIN_PATH_SUFFIX = "-blockchain.json";
 
 }
