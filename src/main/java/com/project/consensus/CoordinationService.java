@@ -21,10 +21,6 @@ import java.nio.ByteBuffer;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
-
-import static com.project.Constants.RATING_AGENT_DIR;
-import static com.project.Constants.ZK_CONNECTION_STRING;
 
 
 @Service
@@ -36,24 +32,22 @@ public class CoordinationService {
     LeaderSelector leaderSelector;
 
     RetryPolicy retryPolicy = new RetryNTimes(3, 100);
-    final int epocInterval = 10;
+
 
     @PostConstruct
     public void init()  throws Exception
     {
-        zConn =  new ZooKeeper(ZK_CONNECTION_STRING, 3000, we -> {
+        zConn =  new ZooKeeper(Constants.ZK_CONNECTION_STRING, 3000, we -> {
             if (we.getState() == Watcher.Event.KeeperState.SyncConnected) {
                 System.out.println("Connected...");
             }
         });
 
-        if(zConn.exists(RATING_AGENT_DIR, true)==null){
+        if(zConn.exists(Constants.RATING_AGENT_DIR, true)==null){
             ByteBuffer buffer = ByteBuffer.allocate(Long.BYTES);
             buffer.putLong(new Date().getTime());
             zConn.create("/rating-agents",buffer.array(),ZooDefs.Ids.OPEN_ACL_UNSAFE,CreateMode.PERSISTENT);
         }
-
-
     }
 
 
@@ -91,9 +85,9 @@ public class CoordinationService {
                     @Override
                     public void takeLeadership(
                             CuratorFramework client) throws Exception {
-
                         epoch.setCount(epoch.getCount() + 1);
                         System.out.println(" is now the leader. Waiting ..." + epoch.getCount());
+                        long startTime = new Date().getTime();
 
                         try
                         {
@@ -129,11 +123,10 @@ public class CoordinationService {
                                 }else{
                                     System.out.println("Not proposing block");
                                 }
-
-
                             }
-
-                            Thread.sleep(TimeUnit.SECONDS.toMillis(epocInterval));
+                            long endTime = new Date().getTime();
+                            //if sometime is remaining from defined epoc time ,wait it out.
+                            Thread.sleep(Constants.EPOCH_INTERVAL_MILLIS-(endTime-startTime));
 
                         }
                         catch ( Exception e )

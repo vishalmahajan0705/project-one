@@ -25,4 +25,7 @@ public class Constants {
     public static final String BLOCKCHAIN_PATH_PREFIX = "src/main/resources/local/rating-agent-";
     public static final String BLOCKCHAIN_PATH_SUFFIX = "-blockchain.json";
 
+    public static final int EPOCH_INTERVAL_MILLIS = 3000;
+    public static final int CONSENSUS_TIMEOUT_MILLIS = 2000;
+
 }

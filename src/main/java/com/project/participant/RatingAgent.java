@@ -100,7 +100,7 @@ public class RatingAgent extends AbstractMulticastNode implements DisposableBean
 
             try {
                 synchronized (mutex){
-                    mutex.wait(3000);
+                    mutex.wait(Constants.CONSENSUS_TIMEOUT_MILLIS);
                 }
             } catch (InterruptedException e) {
                 e.printStackTrace();
