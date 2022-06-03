@@ -4,7 +4,7 @@
 git clone https://github.com/vishalmahajan0705/project-one.git
 
 ## (2) Build
-cd project-one
+cd project-one <br>
 mvn clean install
 
 ## (3) Start Zookeeper
