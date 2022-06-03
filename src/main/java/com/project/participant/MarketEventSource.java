@@ -1,5 +1,6 @@
 package com.project.participant;
 
+import com.project.Constants;
 import com.project.blockchain.Transaction;
 import com.project.network.AbstractMulticastNode;
 import java.io.IOException;
@@ -32,7 +33,7 @@ public class MarketEventSource extends AbstractMulticastNode {
 
     public void processMessage(String message){
 
-        if(message.contains("hash")){
+        if(message.contains(Constants.BLOCK_ATTRIBUTE)){
             return;
         }
 

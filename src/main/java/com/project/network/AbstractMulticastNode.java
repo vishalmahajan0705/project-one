@@ -8,7 +8,9 @@ import java.net.MulticastSocket;
 
 import static com.project.Constants.*;
 
-
+/*
+Send and receive messages. Message recipient overrides processMessage method.
+ */
 public abstract class AbstractMulticastNode {
 
 

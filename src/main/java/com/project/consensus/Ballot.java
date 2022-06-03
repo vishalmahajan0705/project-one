@@ -19,7 +19,8 @@ public class Ballot {
 
 
     /* if votes exceed 2/3 times the total nodes, consensus is achieved.
-       vote count maintained at a epoc level and is incremented each time a node receives vote on a block in given epoch
+       vote count maintained at a epoc level by each rating agent
+       and is incremented each time a node receives vote on a block in given epoch
      */
 
     public boolean hasConsensus(){

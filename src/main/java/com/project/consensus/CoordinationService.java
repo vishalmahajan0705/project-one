@@ -22,6 +22,11 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+/*
+    This service uses ZK to facilitate Leader Election at each Epoc interval.
+    Epoc is managed via a shared counter in ZK and incremented every Constants.EPOCH_INTERVAL_MILLIS
+    A new Leader Rating agent is elected at each epoch interval. (leader path in ZK is /leader/epoch-leader)
+ */
 
 @Service
 public class CoordinationService {
@@ -58,12 +63,18 @@ public class CoordinationService {
     }
 
 
+
     public void election(RatingAgent r){
         System.out.println("Starting election...");
 
         client = CuratorFrameworkFactory
                 .newClient(Constants.ZK_CONNECTION_STRING, retryPolicy);
         client.start();
+
+
+        // Epoch number is maintained as a shared counter managed by zookeeper (/counter/epoch Persistent Node)
+        // A new rating agent is elected at each epoc interval
+
 
         epoch = new SharedCount(client, "/counter/epoch", 0);
         try {
@@ -72,6 +83,11 @@ public class CoordinationService {
             e.printStackTrace();
         }
 
+        /*
+         Epoch is incremented every Constants.EPOCH_INTERVAL_MILLIS,  for the duration of this interval the leader assembles transactions to block,
+         proposes it, the block is voted for and committed post consensus.
+         At the end of the epoc leadership is relinquished and the leader goes back into the queue for subsequent election at a later time.
+         */
 
         leaderSelector = new LeaderSelector(client,
                 "/leader/epoch-leader",

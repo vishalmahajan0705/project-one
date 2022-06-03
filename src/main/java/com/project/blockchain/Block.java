@@ -39,6 +39,11 @@ public class Block {
 
     }
 
+    /*
+     New block contains epoch ID  , merkleRoot for included transactions, timestamp, previous block hash and hash of the current block.
+     Hash for new block is computed using computeHash method.
+    */
+
     public String computeHash() {
         String merkleRoot = (getTransactions().size()>0)?computeMerkleRoot():null;
         setMerkleRootHash(merkleRoot);
@@ -130,8 +135,6 @@ public class Block {
     public List<Transaction> getTransactions() {
         return transactions;
     }
-
-
 
     public String getRatingAgentId() {
         return ratingAgentId;

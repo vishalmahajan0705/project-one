@@ -24,8 +24,6 @@ import java.util.concurrent.ConcurrentHashMap;
 @Component
 public class RatingAgent extends AbstractMulticastNode implements DisposableBean{
 
-
-
     private String ratingAgentId;
     private final Object mutex = new Object();
 
@@ -217,9 +215,26 @@ public class RatingAgent extends AbstractMulticastNode implements DisposableBean
         this.ratingAgentId = ratingAgentId;
     }
 
+    public List<Block> query(String firmId){
+        return this.localBlockchain.readBlocks(firmId);
+    }
 
+    public List<Block> query(String firmId, long startTime, long endTime){
+        return this.localBlockchain.readBlocks(firmId,startTime,endTime);
+    }
 
+    //todo
+    public void computeRatings(){
+        /*
+        Ratings are computed by individual rating agents using information in blockchain and published periodically.
+        Each rating agent can use a different algorithm to arrive at ratings , however rating has to be voted for
+        by other agents who accept a rating block within the a delta threshold of the rating they compute for the same firm/timestamp.
+        Each rating also contains a hash of the codebase that was used to compute it at a point in time;
+        this serves to provide an audit trail with full lineage to how the rating number was arrived at.
 
+        Ratings are published at configurable interval.
+         */
+    }
 
 
 }

@@ -15,6 +15,10 @@ public class Blockchain {
     private final List<Block> bChain = new ArrayList<>();
     private String path;
 
+    /*
+    All transactions are first added to pendingTransactions and maintained here until they are confirmed in a block.
+    Once confirmed for a block transactions are removed from pendingTransactions.
+     */
     private final Map<String, List<Transaction>> pendingTransactions;
 
     {
@@ -44,6 +48,9 @@ public class Blockchain {
         return pendingTransactions;
     }
 
+    /*
+    persist block to path defined for ratingAgent holding instance of this class.
+     */
     public void commitBlock(Block block) {
         BufferedWriter bw = null;
         try {
@@ -94,6 +101,9 @@ public class Blockchain {
 
     }
 
+    /*
+    basic query method to read blocks by firmId or by firmId and date range
+    */
     public  List<Block> readBlocks(String firmId,long startTime,long endTime){
         List<Block> blocks = new ArrayList<>();
 
@@ -101,8 +111,28 @@ public class Blockchain {
              BufferedReader reader =
                      new BufferedReader(new InputStreamReader(in))) {
             String line;
+
             while ((line = reader.readLine()) != null) {
-                blocks.add(Block.fromJSON(line));
+                Block b = Block.fromJSON(line);
+                if(b.getTransactions().get(0).getFirmId().equals(firmId)){
+                    if(startTime>0 && endTime>0){
+                        if(b.getTimestamp()>=startTime && b.getTimestamp()<=endTime){
+                            blocks.add(b);
+                        }
+                    }else if(startTime>0 && endTime==0){
+                        if(b.getTimestamp()>=startTime){
+                            blocks.add(b);
+                        }
+                    }else if(startTime==0 && endTime>=0){
+                        if(b.getTimestamp()<=startTime){
+                            blocks.add(b);
+                        }
+                    }else{
+                        blocks.add(b);
+                    }
+
+                }
+
             }
         } catch (IOException e) {
             System.err.println(e.getMessage());
@@ -110,6 +140,11 @@ public class Blockchain {
 
         System.out.println(blocks.size());
         return blocks;
+    }
+
+
+    public  List<Block> readBlocks(String firmId){
+        return readBlocks(firmId,0,0);
     }
 
 
