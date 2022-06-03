@@ -37,11 +37,11 @@ Note:More rating agents can be added if needed. <br>
 Any of the rating agents will be elected leader and remain leader for ecoch interval, at the end of the epoc another rating agent would be made leader
 messages on the prompt will indicate the rating agent that is currently the leader.
 
-## (8) Start Byzantine Rating Agent 
+## (9) Start Byzantine Rating Agent 
 mvn spring-boot:run -Dspring-boot.run.arguments=**BR** <br>
 
 
-## (9) Send Events
+## (10) Send Events
 Goto Internal Event Source window (started in Step 4) and type event GOOD  <br>
 Type more events as needed - followiong values can be used GOOD  BAD AVERAGE <br>
 Note for logs showing up on leader and follower nodes. <br>
